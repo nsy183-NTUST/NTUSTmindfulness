@@ -30,13 +30,12 @@
             position: relative;
         }
 
-        /* 修改後的右上角文字樣式 */
         .school-header {
             position: absolute;
             top: 1rem;
             right: 1.5rem;
             color: white;
-            font-size: 1rem; /* 稍微加大一點點，方便閱讀 */
+            font-size: 1rem;
             font-weight: 400;
             letter-spacing: 1px;
             opacity: 0.9;
@@ -46,7 +45,6 @@
             line-height: 1.5;
         }
 
-        /* 畫面中央主區域 */
         .main-container {
             flex: 1;
             display: flex;
@@ -86,7 +84,7 @@
 
         #guide-text {
             color: white;
-            font-size: 2rem;
+            font-size: 2.2rem;
             font-weight: bold;
             text-shadow: 0 2px 10px rgba(0,0,0,0.5);
             user-select: none;
@@ -122,32 +120,33 @@
         .slider-label-row {
             display: flex;
             justify-content: space-between;
-            font-size: 0.9rem;
-            opacity: 0.8;
+            font-size: 0.95rem;
+            opacity: 0.9;
         }
 
         .slider-label-row .time-val {
-            color: var(--ntust-blue);
+            color: #4da3ff; 
             font-weight: bold;
         }
 
         input[type=range] {
             width: 100%;
-            height: 6px;
+            height: 8px;
             background: #444;
-            border-radius: 3px;
+            border-radius: 4px;
             outline: none;
             -webkit-appearance: none;
+            cursor: pointer;
         }
 
         input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            height: 18px;
-            width: 18px;
+            height: 20px;
+            width: 20px;
             border-radius: 50%;
             background: var(--ntust-blue);
-            cursor: pointer;
             border: 2px solid white;
+            cursor: pointer;
         }
 
         .bottom-row {
@@ -171,19 +170,21 @@
 
         .stat-item .value {
             font-weight: bold;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
+            color: #fff;
         }
 
         #start-stop-btn {
             background-color: var(--ntust-blue);
             color: white;
             border: none;
-            padding: 0.7rem 2.5rem;
+            padding: 0.8rem 3rem;
             border-radius: 30px;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.2s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
 
         #start-stop-btn.running {
@@ -191,11 +192,9 @@
         }
 
         @media (max-height: 700px) {
-            .circle-reference, .breathing-circle {
-                width: 180px;
-                height: 180px;
-            }
+            .circle-reference, .breathing-circle { width: 180px; height: 180px; }
             .main-container { padding-bottom: 180px; }
+            #guide-text { font-size: 1.6rem; }
         }
     </style>
 </head>
@@ -222,7 +221,7 @@
             </div>
             <div class="slider-group">
                 <div class="slider-label-row"><span>停頓 (Hold)</span><span class="time-val"><span id="val-hold1">7</span>s</span></div>
-                <input type="range" id="slide-hold1" min="1" max="10" value="7">
+                <input type="range" id="slide-hold1" min="0" max="10" value="7">
             </div>
             <div class="slider-group">
                 <div class="slider-label-row"><span>吐氣 (Exhale)</span><span class="time-val"><span id="val-exhale">8</span>s</span></div>
@@ -276,25 +275,28 @@
         async function runBreathingCycle() {
             if (!isRunning) return;
 
-            const dInhale = parseInt(sliders.inhale.input.value) * 1000;
-            const dHold1 = parseInt(sliders.hold1.input.value) * 1000;
-            const dExhale = parseInt(sliders.exhale.input.value) * 1000;
-            const dHold2 = parseInt(sliders.hold2.input.value) * 1000;
-
+            // 1. 吸氣
+            let dInhale = parseInt(sliders.inhale.input.value) * 1000;
             setAnimationState("吸氣...", SCALE_MAX, dInhale);
             await sleep(dInhale);
             if (!isRunning) return;
 
+            // 2. 吸氣後停頓 (若為 0 會直接跳過)
+            let dHold1 = parseInt(sliders.hold1.input.value) * 1000;
             if (dHold1 > 0) {
                 setAnimationState("停頓...", SCALE_MAX, 0);
                 await sleep(dHold1);
             }
             if (!isRunning) return;
 
+            // 3. 吐氣
+            let dExhale = parseInt(sliders.exhale.input.value) * 1000;
             setAnimationState("吐氣...", SCALE_MIN, dExhale);
             await sleep(dExhale);
             if (!isRunning) return;
 
+            // 4. 吐氣後停頓 (若為 0 會直接跳過)
+            let dHold2 = parseInt(sliders.hold2.input.value) * 1000;
             if (dHold2 > 0) {
                 setAnimationState("停頓...", SCALE_MIN, 0);
                 await sleep(dHold2);
@@ -324,7 +326,6 @@
             cycleCountDisplay.textContent = '0';
             startTime = Date.now();
             updateTotalTimeDisplay();
-            toggleSliders(true);
             requestWakeLock();
             totalTimeInterval = setInterval(updateTotalTimeDisplay, 1000);
             runBreathingCycle();
@@ -335,11 +336,10 @@
             startStopBtn.textContent = "開始練習";
             startStopBtn.classList.remove('running');
             guideText.textContent = "練習結束";
-            toggleSliders(false);
             releaseWakeLock();
             if (totalTimeInterval) clearInterval(totalTimeInterval);
             if (animationTimeout) clearTimeout(animationTimeout);
-            circle.style.transition = 'transform 0.5s ease-out';
+            circle.style.transition = 'transform 0.8s ease-out';
             circle.style.transform = `scale(${SCALE_MIN})`;
         }
 
@@ -348,13 +348,6 @@
             const m = Math.floor(elapsedSeconds / 60).toString().padStart(2, '0');
             const s = (elapsedSeconds % 60).toString().padStart(2, '0');
             totalTimeDisplay.textContent = `${m}:${s}`;
-        }
-
-        function toggleSliders(disabled) {
-            Object.keys(sliders).forEach(key => {
-                sliders[key].input.disabled = disabled;
-                sliders[key].input.style.opacity = disabled ? 0.5 : 1;
-            });
         }
 
         startStopBtn.addEventListener('click', () => {
