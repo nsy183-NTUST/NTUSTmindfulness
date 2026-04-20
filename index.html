@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>正念呼吸計時器 - NTUST</title>
+    <title>正念呼吸引導 - NTUST</title>
     <style>
         :root {
             --ntust-blue: #005BAB;
@@ -11,14 +11,10 @@
             --text-color: #f2f2f2;
             --circle-border: rgba(255, 255, 255, 0.2);
             --panel-bg: #2a2a2a;
+            --accent-blue: #4da3ff;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif; }
 
         body {
             background-color: var(--background-color);
@@ -36,22 +32,18 @@
             right: 1.5rem;
             color: white;
             font-size: 1rem;
-            font-weight: 400;
-            letter-spacing: 1px;
             opacity: 0.9;
-            pointer-events: none;
             text-align: right;
             z-index: 10;
-            line-height: 1.5;
         }
 
+        /* 中央圓圈區域 */
         .main-container {
             flex: 1;
             display: flex;
             justify-content: center;
             align-items: center;
-            position: relative;
-            padding-bottom: 220px; 
+            padding-bottom: 250px; 
         }
 
         .breathing-circle-container {
@@ -62,23 +54,23 @@
         }
 
         .circle-reference {
-            width: 250px;
-            height: 250px;
+            width: 280px;
+            height: 280px;
             border: 2px solid var(--circle-border);
             border-radius: 50%;
             position: absolute;
         }
 
         .breathing-circle {
-            width: 250px;
-            height: 250px;
+            width: 280px;
+            height: 280px;
             background-color: var(--ntust-blue);
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
             transform: scale(0.6); 
-            box-shadow: 0 0 50px rgba(0, 91, 171, 0.4);
+            box-shadow: 0 0 60px rgba(0, 91, 171, 0.5);
             transition: transform 1s linear; 
         }
 
@@ -87,9 +79,11 @@
             font-size: 2.2rem;
             font-weight: bold;
             text-shadow: 0 2px 10px rgba(0,0,0,0.5);
-            user-select: none;
+            text-align: center;
+            padding: 0 20px;
         }
 
+        /* 下方控制面板 */
         .control-panel {
             position: absolute;
             bottom: 0;
@@ -98,103 +92,116 @@
             background-color: var(--panel-bg);
             padding: 1.5rem 2rem;
             border-top: 1px solid rgba(255,255,255,0.1);
-            box-shadow: 0 -10px 30px rgba(0,0,0,0.3);
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 1.2rem;
             z-index: 100;
         }
 
         .sliders-container {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 1rem 2rem;
+            gap: 0.8rem 2rem;
         }
 
-        .slider-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.3rem;
-        }
+        .slider-group { display: flex; flex-direction: column; gap: 0.2rem; }
 
         .slider-label-row {
             display: flex;
             justify-content: space-between;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             opacity: 0.9;
         }
 
-        .slider-label-row .time-val {
-            color: #4da3ff; 
-            font-weight: bold;
-        }
+        .time-val { color: var(--accent-blue); font-weight: bold; }
 
         input[type=range] {
             width: 100%;
-            height: 8px;
+            height: 6px;
             background: #444;
             border-radius: 4px;
             outline: none;
             -webkit-appearance: none;
-            cursor: pointer;
         }
 
         input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            height: 20px;
-            width: 20px;
+            height: 18px; width: 18px;
             border-radius: 50%;
             background: var(--ntust-blue);
             border: 2px solid white;
             cursor: pointer;
         }
 
+        /* 語音開關與練習時長設定 */
+        .settings-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255,255,255,0.05);
+            padding: 10px 15px;
+            border-radius: 10px;
+        }
+
+        .toggle-container { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        
         .bottom-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-top: 0.5rem;
-            padding-top: 0.5rem;
-            border-top: 1px solid rgba(255,255,255,0.05);
         }
 
-        .stats-display {
-            display: flex;
-            gap: 2rem;
-        }
-
-        .stat-item .label {
-            opacity: 0.7;
-            margin-right: 0.5rem;
-        }
-
-        .stat-item .value {
-            font-weight: bold;
-            font-size: 1.2rem;
-            color: #fff;
-        }
+        .stats-display { display: flex; gap: 1.5rem; }
+        .stat-item .label { opacity: 0.6; font-size: 0.85rem; margin-right: 5px; }
+        .stat-item .value { font-weight: bold; font-size: 1.1rem; }
 
         #start-stop-btn {
             background-color: var(--ntust-blue);
             color: white;
             border: none;
-            padding: 0.8rem 3rem;
+            padding: 0.8rem 2.5rem;
             border-radius: 30px;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.2s;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
 
-        #start-stop-btn.running {
-            background-color: #d9534f;
-        }
+        #start-stop-btn.running { background-color: #d9534f; }
 
-        @media (max-height: 700px) {
-            .circle-reference, .breathing-circle { width: 180px; height: 180px; }
-            .main-container { padding-bottom: 180px; }
-            #guide-text { font-size: 1.6rem; }
+        /* 隱藏的原生 Checkbox，用自定義樣式 */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+        }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider-round {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #555;
+            transition: .4s;
+            border-radius: 20px;
+        }
+        .slider-round:before {
+            position: absolute;
+            content: "";
+            height: 14px; width: 14px;
+            left: 3px; bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider-round { background-color: var(--ntust-blue); }
+        input:checked + .slider-round:before { transform: translateX(20px); }
+
+        @media (max-height: 750px) {
+            .circle-reference, .breathing-circle { width: 200px; height: 200px; }
+            .main-container { padding-bottom: 220px; }
+            #guide-text { font-size: 1.5rem; }
         }
     </style>
 </head>
@@ -220,12 +227,12 @@
                 <input type="range" id="slide-inhale" min="1" max="10" value="4">
             </div>
             <div class="slider-group">
-                <div class="slider-label-row"><span>停頓 (Hold)</span><span class="time-val"><span id="val-hold1">7</span>s</span></div>
-                <input type="range" id="slide-hold1" min="0" max="10" value="7">
+                <div class="slider-label-row"><span>停頓 (Hold)</span><span class="time-val"><span id="val-hold1">0</span>s</span></div>
+                <input type="range" id="slide-hold1" min="0" max="10" value="0">
             </div>
             <div class="slider-group">
-                <div class="slider-label-row"><span>吐氣 (Exhale)</span><span class="time-val"><span id="val-exhale">8</span>s</span></div>
-                <input type="range" id="slide-exhale" min="1" max="10" value="8">
+                <div class="slider-label-row"><span>吐氣 (Exhale)</span><span class="time-val"><span id="val-exhale">6</span>s</span></div>
+                <input type="range" id="slide-exhale" min="1" max="10" value="6">
             </div>
             <div class="slider-group">
                 <div class="slider-label-row"><span>停頓 (Hold)</span><span class="time-val"><span id="val-hold2">0</span>s</span></div>
@@ -233,10 +240,24 @@
             </div>
         </div>
 
+        <div class="settings-row">
+            <div class="slider-group" style="flex: 1; margin-right: 30px;">
+                <div class="slider-label-row"><span>練習總時長</span><span class="time-val"><span id="val-duration">10</span> 分鐘</span></div>
+                <input type="range" id="slide-duration" min="1" max="60" value="10">
+            </div>
+            <label class="toggle-container">
+                <span style="font-size: 0.9rem; opacity: 0.9;">語音引導</span>
+                <div class="switch">
+                    <input type="checkbox" id="voice-toggle" checked>
+                    <span class="slider-round"></span>
+                </div>
+            </label>
+        </div>
+
         <div class="bottom-row">
             <div class="stats-display">
-                <div class="stat-item"><span class="label">完成循環</span><span class="value" id="cycle-count">0</span></div>
-                <div class="stat-item"><span class="label">總時長</span><span class="value" id="total-time">00:00</span></div>
+                <div class="stat-item"><span class="label">循環</span><span class="value" id="cycle-count">0</span></div>
+                <div class="stat-item"><span class="label">時間</span><span class="value" id="total-time">00:00</span></div>
             </div>
             <button id="start-stop-btn">開始練習</button>
         </div>
@@ -248,6 +269,9 @@
         const startStopBtn = document.getElementById('start-stop-btn');
         const cycleCountDisplay = document.getElementById('cycle-count');
         const totalTimeDisplay = document.getElementById('total-time');
+        const voiceToggle = document.getElementById('voice-toggle');
+        const durationSlider = document.getElementById('slide-duration');
+        const durationValText = document.getElementById('val-duration');
 
         const sliders = {
             inhale: { input: document.getElementById('slide-inhale'), val: document.getElementById('val-inhale') },
@@ -261,29 +285,48 @@
         let totalTimeInterval = null;
         let cycleCount = 0;
         let startTime = 0;
+        let targetMinutes = 10;
         let wakeLock = null;
 
+        const synth = window.speechSynthesis;
         const SCALE_MIN = 0.6;
         const SCALE_MAX = 1.0;
 
+        // 滑桿數值顯示更新
         Object.keys(sliders).forEach(key => {
-            sliders[key].input.addEventListener('input', (e) => {
-                sliders[key].val.textContent = e.target.value;
-            });
+            sliders[key].input.addEventListener('input', (e) => { sliders[key].val.textContent = e.target.value; });
         });
+        durationSlider.addEventListener('input', (e) => {
+            durationValText.textContent = e.target.value;
+            targetMinutes = parseInt(e.target.value);
+        });
+
+        // 語音播放函式
+        function speak(text) {
+            if (!voiceToggle.checked || !isRunning) return;
+            // 播放前先取消之前的語音，避免重疊
+            synth.cancel();
+            const utter = new SpeechSynthesisUtterance(text);
+            utter.lang = 'zh-TW';
+            utter.rate = 0.85; // 語速稍慢，聽起來比較溫柔
+            utter.pitch = 1.0;
+            synth.speak(utter);
+        }
 
         async function runBreathingCycle() {
             if (!isRunning) return;
 
             // 1. 吸氣
             let dInhale = parseInt(sliders.inhale.input.value) * 1000;
+            speak("吸氣");
             setAnimationState("吸氣...", SCALE_MAX, dInhale);
             await sleep(dInhale);
             if (!isRunning) return;
 
-            // 2. 吸氣後停頓 (若為 0 會直接跳過)
+            // 2. 停頓1
             let dHold1 = parseInt(sliders.hold1.input.value) * 1000;
             if (dHold1 > 0) {
+                speak("停頓");
                 setAnimationState("停頓...", SCALE_MAX, 0);
                 await sleep(dHold1);
             }
@@ -291,13 +334,15 @@
 
             // 3. 吐氣
             let dExhale = parseInt(sliders.exhale.input.value) * 1000;
+            speak("吐氣");
             setAnimationState("吐氣...", SCALE_MIN, dExhale);
             await sleep(dExhale);
             if (!isRunning) return;
 
-            // 4. 吐氣後停頓 (若為 0 會直接跳過)
+            // 4. 停頓2
             let dHold2 = parseInt(sliders.hold2.input.value) * 1000;
             if (dHold2 > 0) {
+                speak("停頓");
                 setAnimationState("停頓...", SCALE_MIN, 0);
                 await sleep(dHold2);
             }
@@ -325,26 +370,46 @@
             cycleCount = 0;
             cycleCountDisplay.textContent = '0';
             startTime = Date.now();
+            targetMinutes = parseInt(durationSlider.value);
+            
             updateTotalTimeDisplay();
             requestWakeLock();
             totalTimeInterval = setInterval(updateTotalTimeDisplay, 1000);
             runBreathingCycle();
         }
 
-        function stopPractice() {
+        function stopPractice(isAutoEnd = false) {
             isRunning = false;
             startStopBtn.textContent = "開始練習";
             startStopBtn.classList.remove('running');
-            guideText.textContent = "練習結束";
+            
+            const msg = `本次練習結束，恭喜你完成了 ${targetMinutes} 分鐘的呼吸練習`;
+            
+            if (isAutoEnd) {
+                guideText.textContent = msg;
+                if (voiceToggle.checked) speak(msg);
+            } else {
+                guideText.textContent = "練習結束";
+                synth.cancel(); // 手動停止時立即切斷語音
+            }
+
             releaseWakeLock();
             if (totalTimeInterval) clearInterval(totalTimeInterval);
             if (animationTimeout) clearTimeout(animationTimeout);
+            
             circle.style.transition = 'transform 0.8s ease-out';
             circle.style.transform = `scale(${SCALE_MIN})`;
         }
 
         function updateTotalTimeDisplay() {
             const elapsedSeconds = Math.floor((Date.now() - startTime) / 1000);
+            
+            // 檢查是否到達設定時間
+            if (elapsedSeconds >= targetMinutes * 60) {
+                stopPractice(true);
+                return;
+            }
+
             const m = Math.floor(elapsedSeconds / 60).toString().padStart(2, '0');
             const s = (elapsedSeconds % 60).toString().padStart(2, '0');
             totalTimeDisplay.textContent = `${m}:${s}`;
@@ -359,7 +424,6 @@
                 try { wakeLock = await navigator.wakeLock.request('screen'); } catch (err) {}
             }
         }
-
         function releaseWakeLock() {
             if (wakeLock !== null) { wakeLock.release().then(() => { wakeLock = null; }); }
         }
